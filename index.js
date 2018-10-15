@@ -1,10 +1,11 @@
 'use strict';
 
 const express = require('express');
+const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 
-const { PORT, MONGODB_URI } = require('./config');
+const { PORT, MONGODB_URI, CLIENT_ORIGIN } = require('./config');
 
 const usersRouter = require('./routes/users');
 
@@ -15,6 +16,12 @@ const app = express();
 app.use(
   morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
     skip: () => process.env.NODE_ENV === 'test'
+  })
+);
+
+app.use(
+  cors({
+    origin: CLIENT_ORIGIN
   })
 );
 
