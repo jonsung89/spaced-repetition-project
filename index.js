@@ -3,19 +3,23 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const passport = require('passport');
 const mongoose = require('mongoose');
 
-const { PORT, MONGODB_URI, CLIENT_ORIGIN } = require('./config');
+const { PORT, CLIENT_ORIGIN } = require('./config');
+const { dbConnect } = require('./db-mongoose');
+const localStrategy = require('./passport/local');
+const jwtStrategy = require('./passport/jwt');
 
+// const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 
 // Create Express Application
 const app = express();
 
-// Morgan Middleware to Log all requests
 app.use(
-  morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
-    skip: () => process.env.NODE_ENV === 'test'
+  morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
+    skip: (req, res) => process.env.NODE_ENV === 'test'
   })
 );
 
@@ -25,22 +29,21 @@ app.use(
   })
 );
 
-// Parse Request Body
+passport.use(localStrategy);
+passport.use(jwtStrategy);
+
+//Body parser
 app.use(express.json());
 
-// Routing
-app.get('/api/test', (req, res) => res.send('Hello World!'));
+// app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
-// app.use('/api', authRouter);
 
-// Custom 404 Not Found route handler
 app.use((req, res, next) => {
   const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-// Custom Error Handler
 app.use((err, req, res, next) => {
   if (err.status) {
     const errBody = Object.assign({}, err, { message: err.message });
@@ -51,32 +54,20 @@ app.use((err, req, res, next) => {
   }
 });
 
-// Connect to DB and Listen for incoming connections
-
-if (process.env.NODE_ENV !== 'test') {
-  mongoose
-    .connect(MONGODB_URI)
-    .then(instance => {
-      const conn = instance.connections[0];
-      console.info(
-        `Connected to: mongodb://${conn.host}:${conn.port}/${conn.name}`
-      );
+function runServer(port = PORT) {
+  const server = app
+    .listen(port, () => {
+      console.info(`App listening on port ${server.address().port}`);
     })
-    .catch(err => {
-      console.error(`ERROR: ${err.message}`);
-      console.error('\n === Did you remember to start `mongod`? === \n');
+    .on('error', err => {
+      console.error('Express failed to start');
       console.error(err);
-    })
-    .then(() => {
-      app
-        .listen(PORT, function() {
-          console.info(`Server listening on ${this.address().port}`);
-        })
-        .on('error', err => {
-          console.error(err);
-        });
     });
 }
 
-// Export for testing
-module.exports = app;
+if (require.main === module) {
+  dbConnect();
+  runServer();
+}
+
+module.exports = { app };
