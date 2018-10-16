@@ -11,39 +11,21 @@ const { dbConnect } = require('./db-mongoose');
 const localStrategy = require('./passport/local');
 const jwtStrategy = require('./passport/jwt');
 
-// const authRouter = require('./routes/auth');
+const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 
 // Create Express Application
 const app = express();
 
-const allowCrossDomain = function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, Content-Length, X-Requested-With'
-  );
-
-  // intercept OPTIONS method
-  if ('OPTIONS' == req.method) {
-    res.send(200);
-  } else {
-    next();
-  }
-};
-
-app.use(allowCrossDomain);
-
 app.use(
-  morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
-    skip: (req, res) => process.env.NODE_ENV === 'test'
+  cors({
+    origin: CLIENT_ORIGIN
   })
 );
 
 app.use(
-  cors({
-    origin: CLIENT_ORIGIN
+  morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
+    skip: (req, res) => process.env.NODE_ENV === 'test'
   })
 );
 
@@ -53,7 +35,7 @@ passport.use(jwtStrategy);
 //Body parser
 app.use(express.json());
 
-// app.use('/api/auth', authRouter);
+app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 
 app.use((req, res, next) => {
