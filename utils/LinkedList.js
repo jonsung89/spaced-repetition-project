@@ -1,5 +1,50 @@
 'use strict';
 
+// const generateNewQuestions = function(
+//   questions,
+//   questionLevels,
+//   startIndex = 0
+// ) {
+//   let newArray = [];
+//   // find the lowest values in the questionLevel array and push them to newArray
+//   let lowestLevel = 5;
+//   for (let i = 0; i < questionLevels.length; i++) {
+//     if (questionLevels[i].level < lowestLevel) {
+//       lowestLevel = questionLevels[i].level;
+//     }
+//   }
+//   // found the lowest level
+//   // loop through the questionLevel array to find the question within that index
+//   for (let i = startIndex; i < questionLevels.length; i++) {
+//     const questionIndex = i % questionLevels.length;
+//     if (questionLevels[questionIndex].level === lowestLevel) {
+//       newArray.push(questions[questionIndex]);
+//     }
+//   }
+//   return newArray;
+// };
+
+// const handleAnswer = function(questions, userData, isCorrect) {
+//   const questionIndex = questions.findIndex(answer => {
+//     return answer._id.toString() === userData.filteredList[0]._id.toString();
+//   });
+
+//   if (isCorrect) {
+//     // if correct, go to question levels and increment by 1
+//     if (userData.questionLevels[questionIndex].level < 5) {
+//       userData.questionLevels[questionIndex].level++;
+//     }
+//   } else {
+//     if (userData.questionLevels[questionIndex].level > 0) {
+//       userData.questionLevels[questionIndex].level--;
+//     }
+//   }
+//   userData.filteredList.shift();
+//   return userData;
+// };
+
+// module.exports = { handleAnswer, generateNewQuestions };
+
 const seedQuestions = require('../db/questions');
 
 class _Node {
