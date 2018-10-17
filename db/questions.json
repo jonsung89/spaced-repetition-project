@@ -1,0 +1,42 @@
+[
+  {
+    "question": "안녕하세요 (Ahn-young-ha-seh-yo)",
+    "answer": "Hello/Goodbye"
+  },
+  {
+    "question": "감사합니다 (Kahm-sa-ham-ni-da)",
+    "answer": "Thank you"
+  },
+  {
+    "question": "미안합니다 (Mi-ahn-ham-ni-da)",
+    "answer": "I'm sorry"
+  },
+  {
+    "question": "잠시만요 (Jahm-shi-man-yo)",
+    "answer": "Excuse me/Just a moment"
+  },
+  {
+    "question": "얼마예요? (Uhl-ma-yeh-yo)",
+    "answer": "How much is it?"
+  },
+  {
+    "question": "한국말 잘 못해요 (Hahn-gook-mal-jal-mot-hae-yo)",
+    "answer": "I can't speak Korean well"
+  },
+  {
+    "question": "반갑습니다 (Bahn-gahp-seup-ni-da)",
+    "answer": "Nice to meet you"
+  },
+  {
+    "question": "화장실이 어디예요? (Hwa-jang-shil-ee  uh-di-eh-yo?)",
+    "answer": "Where is the bathroom?"
+  },
+  {
+    "question": "도와주세요! (Doh-wah-joo-seh-yo)",
+    "answer": "Help!"
+  },
+  {
+    "question": "사랑해요 (Sa-rang-hae)",
+    "answer": "I love you"
+  }
+]
