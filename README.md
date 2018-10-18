@@ -18,3 +18,20 @@
 - You will be able to create custom decks and cards. Use it to study medical terminology, the periodic table, or anything else that fits on a card.
 
 ### Tech Stack
+
+#### Back End
+
+- Node
+- Express
+- MongoDB
+- Mongoose
+- JSON Web Token
+- Passport
+
+#### Front End
+
+- HTML5
+- CSS3
+- React
+- Redux
+- Redux Form

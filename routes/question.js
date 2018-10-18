@@ -53,7 +53,7 @@ router.post('/', (req, res, next) => {
         current
       ].question.answer.toLowerCase();
 
-      console.log('real answer: ', user.questions[current].question.answer);
+      console.log('correct answer: ', user.questions[current].question.answer);
       console.log('user answer: ', answer);
 
       if (user.questions[current].question.answer === answer) {
