@@ -1,26 +1,29 @@
 'use strict';
 
 const express = require('express');
+const mongoose = require('mongoose');
+const router = express.Router();
+
 const User = require('../models/user');
-const Router = express.Router();
+const Question = require('../models/question');
 
 // @route   GET api/users/test
 // @desc    Tests users route
 // @access  Public
-Router.get('/test', (req, res) => res.json({ msg: 'Users Works' }));
+router.get('/test', (req, res) => res.json({ msg: 'Users Works' }));
 
 // @route   POST api/users/register
 // @desc    Register user
 // @access  Public
-Router.post('/register', (req, res, next) => {
-  const { username, password } = req.body;
 
+router.post('/register', (req, res, next) => {
+  /***** Never trust users - validate input *****/
   const requiredFields = ['username', 'password'];
   const missingField = requiredFields.find(field => !(field in req.body));
+
   if (missingField) {
     const err = new Error(`Missing '${missingField}' in request body`);
     err.status = 422;
-    err.reason = 'ValidationError';
     return next(err);
   }
 
@@ -28,93 +31,102 @@ Router.post('/register', (req, res, next) => {
   const nonStringField = stringFields.find(
     field => field in req.body && typeof req.body[field] !== 'string'
   );
+
   if (nonStringField) {
-    const err = new Error(
-      `Incorrect field type; expected string for field the following field: '${nonStringField}' `
-    );
+    const err = new Error(`Field: '${nonStringField}' must be type String`);
     err.status = 422;
-    err.reason = 'ValidationError';
     return next(err);
   }
 
-  const explicitlyTrimmedFields = ['username', 'password'];
-  const nonTrimmedFields = explicitlyTrimmedFields.find(
+  const explicityTrimmedFields = ['username', 'password'];
+  const nonTrimmedField = explicityTrimmedFields.find(
     field => req.body[field].trim() !== req.body[field]
   );
-  if (nonTrimmedFields) {
+
+  if (nonTrimmedField) {
     const err = new Error(
-      `Cannot start or end with whitespace for the following field: '${nonTrimmedFields}'`
+      `Field: '${nonTrimmedField}' cannot start or end with whitespace`
     );
     err.status = 422;
-    err.reason = 'ValidationError';
     return next(err);
   }
 
-  const sizeFields = {
-    username: {
-      min: 1
-    },
-    password: {
-      min: 10,
-      max: 72
-    }
+  const sizedFields = {
+    username: { min: 1 },
+    password: { min: 8, max: 72 }
   };
 
-  const tooSmallField = Object.keys(sizeFields).find(
+  const tooSmallField = Object.keys(sizedFields).find(
     field =>
-      'min' in sizeFields[field] &&
-      req.body[field].trim().length < sizeFields[field].min
+      'min' in sizedFields[field] &&
+      req.body[field].trim().length < sizedFields[field].min
   );
-  const tooLargeField = Object.keys(sizeFields).find(
-    field =>
-      'max' in sizeFields[field] &&
-      req.body[field].trim().length > sizeFields[field].max
-  );
-  if (tooSmallField || tooLargeField) {
-    let err;
-    if (tooSmallField) {
-      err = new Error(
-        `${tooSmallField} must be at least ${
-          sizeFields[tooSmallField].min
-        } characters long`
-      );
-      err.status = 422;
-      err.reason = 'ValidationError';
-      next(err);
-    } else {
-      err = new Error(
-        `${tooLargeField} must be at most ${
-          sizeFields[tooLargeField].max
-        } characters long`
-      );
-      err.status = 422;
-      err.reason = 'ValidationError';
-      next(err);
-    }
+  if (tooSmallField) {
+    const min = sizedFields[tooSmallField].min;
+    const err = new Error(
+      `Field: '${tooSmallField}' must be at least ${min} characters long`
+    );
+    err.status = 422;
+    return next(err);
   }
 
-  return User.hashPassword(password)
+  const tooLargeField = Object.keys(sizedFields).find(
+    field =>
+      'max' in sizedFields[field] &&
+      req.body[field].trim().length > sizedFields[field].max
+  );
+
+  if (tooLargeField) {
+    const max = sizedFields[tooLargeField].max;
+    const err = new Error(
+      `Field: '${tooLargeField}' must be at most ${max} characters long`
+    );
+    err.status = 422;
+    return next(err);
+  }
+
+  // Username and password were validated as pre-trimmed
+  let { username, password } = req.body;
+
+  let resolvedQuestions;
+
+  return Question.find()
+    .then(questions => {
+      resolvedQuestions = questions.map((question, index) => ({
+        question,
+        next: index === questions.length - 1 ? null : index + 1
+      }));
+      return;
+    })
+    .then(() => {
+      return User.hashPassword(password);
+    })
     .then(digest => {
-      const newUser = {
+      return User.create({
         username,
         password: digest
-      };
-      return User.create(newUser);
+      });
     })
     .then(user => {
-      return res
+      user.questions = resolvedQuestions;
+      return user.save();
+    })
+    .then(user => {
+      res
         .status(201)
-        .location(`/api/users/${user.id}`)
+        .location(`/users/${user.id}`)
         .json(user);
     })
     .catch(err => {
       if (err.code === 11000) {
-        err = new Error('The username already exists');
-        err.status = 400;
-        err.reason = 'ValidationError';
+        return res.status(400).json({
+          reason: 'Validation Error',
+          message: 'The username already exists',
+          location: 'username'
+        });
       }
       next(err);
     });
 });
 
-module.exports = Router;
+module.exports = router;

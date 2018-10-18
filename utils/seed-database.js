@@ -3,50 +3,31 @@ const mongoose = require('mongoose');
 
 const { MONGODB_URI } = require('../config');
 
-// const User = require('../models/user');
+const User = require('../models/user');
 const Question = require('../models/question');
 
 const seedQuestions = require('../db/questions');
 
 console.log(`Connecting to mongodb at ${MONGODB_URI}`);
 
-return mongoose
+mongoose
   .connect(MONGODB_URI)
-  .then(function() {
-    console.info('DROPPING DATABASE');
+  .then(() => {
+    console.info('Dropping Database');
     return mongoose.connection.db.dropDatabase();
   })
   .then(() => {
-    return Question.insertMany(seedQuestions);
+    console.info('Seeding Database');
+    return Promise.all([
+      Question.insertMany(seedQuestions),
+      Question.createIndexes()
+    ]);
   })
-  .then(res => {
-    console.info(res);
-    console.info('DISCONNECTING');
-    mongoose.disconnect();
+  .then(() => {
+    console.info('Disconnecting');
+    return mongoose.disconnect();
   })
   .catch(err => {
     console.error(err);
     return mongoose.disconnect();
   });
-
-// mongoose
-//   .connect(MONGODB_URI)
-//   .then(() => {
-//     console.info('Dropping Database');
-//     return mongoose.connection.db.dropDatabase();
-//   })
-//   .then(() => {
-//     console.info('Seeding Database');
-//     return Promise.all([
-//       Question.insertMany(seedQuestions),
-//       Question.createIndexes()
-//     ]);
-//   })
-//   .then(() => {
-//     console.info('Disconnecting');
-//     return mongoose.disconnect();
-//   })
-//   .catch(err => {
-//     console.error(err);
-//     return mongoose.disconnect();
-//   });

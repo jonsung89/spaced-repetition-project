@@ -5,7 +5,15 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  password: String
+  password: { type: String, required: true },
+  questions: [
+    {
+      question: { type: mongoose.Schema.Types.ObjectId, ref: 'Question' },
+      next: { type: Number }
+    }
+  ],
+  head: { type: Number, default: 0 },
+  tail: { type: Number, default: 4 }
 });
 
 userSchema.set('toObject', {

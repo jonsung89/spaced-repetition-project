@@ -20,11 +20,17 @@ function createAuthToken(user) {
   });
 }
 
+// @route   POST api/auth/login
+// @desc    Login user
+// @access  Public
 router.post('/login', localAuth, (req, res, next) => {
   const authToken = createAuthToken(req.user);
   res.json({ authToken });
 });
 
+// @route   POST api/auth/refresh
+// @desc    Refreshes token
+// @access  Private
 router.post('/refresh', jwtAuth, (req, res) => {
   const authToken = createAuthToken(req.user);
   res.json({ authToken });

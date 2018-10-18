@@ -1,7 +1,7 @@
 [
   {
     "question": "안녕하세요 (Ahn-young-ha-seh-yo)",
-    "answer": "Hello/Goodbye"
+    "answer": "Hello"
   },
   {
     "question": "감사합니다 (Kahm-sa-ham-ni-da)",
@@ -13,7 +13,7 @@
   },
   {
     "question": "잠시만요 (Jahm-shi-man-yo)",
-    "answer": "Excuse me/Just a moment"
+    "answer": "Excuse me"
   },
   {
     "question": "얼마예요? (Uhl-ma-yeh-yo)",
@@ -32,8 +32,8 @@
     "answer": "Where is the bathroom?"
   },
   {
-    "question": "도와주세요! (Doh-wah-joo-seh-yo)",
-    "answer": "Help!"
+    "question": "도와주세요 (Doh-wah-joo-seh-yo)",
+    "answer": "Help"
   },
   {
     "question": "사랑해요 (Sa-rang-hae)",
