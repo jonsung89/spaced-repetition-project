@@ -53,8 +53,8 @@ router.post('/', (req, res, next) => {
         current
       ].question.answer.toLowerCase();
 
-      console.log('correct answer: ', user.questions[current].question.answer);
-      console.log('user answer: ', answer);
+      // console.log('correct answer: ', user.questions[current].question.answer);
+      // console.log('user answer: ', answer);
 
       if (user.questions[current].question.answer === answer) {
         user.questions[tail].next = current;
@@ -62,7 +62,7 @@ router.post('/', (req, res, next) => {
         user.head = user.questions[current].next;
         user.questions[current].next = null;
 
-        response = 'Correct';
+        response = 'Correct!';
       } else {
         next = user.questions[current].next;
         user.head = next;
